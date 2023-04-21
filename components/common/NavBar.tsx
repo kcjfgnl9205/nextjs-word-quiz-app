@@ -41,7 +41,7 @@ export default function Navbar() {
         menuOpen &&
         <div className="sm:hidden" id="mobile-menu">
           <div className="space-y-1 px-2 pb-3 pt-2">
-            <Link href="/vocabulary/quiz" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">단어퀴즈</Link>
+            <Link href="/vocabulary/quiz" onClick={() => setMenuOpen(prev => !prev)} className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">단어퀴즈</Link>
           </div>
         </div>
       }
