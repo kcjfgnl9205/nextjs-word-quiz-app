@@ -2,7 +2,7 @@ import Link from "next/link";
 import { QuizOptionButton } from "@/components/vocabulary";
 
 
-export default function QuiDetailPage() {
+export default function QuizDetailPage() {
   return (
     <section>
       <div>
