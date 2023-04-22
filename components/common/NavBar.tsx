@@ -26,7 +26,7 @@ export default function Navbar() {
 
           {/* PC버젼 메뉴 */}
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="hidden sm:ml-6 sm:block">
+            <div className="hidden sm:block">
               <div className="flex space-x-4">
                 <Link href="/" className="text-gray-300 rounded-md px-3 py-2 text-sm font-medium">메인로고</Link>
                 <Link href="/vocabulary/quiz" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">단어퀴즈</Link>

@@ -23,6 +23,7 @@ export default function Layout({ children }: Props) {
 
         main {
           flex: 1;
+          max-width: 80rem;
           width: 100%;
           margin: 0 auto;
           background-color: #ffffff;
@@ -30,7 +31,7 @@ export default function Layout({ children }: Props) {
 
         @media (min-width: 768px) {
           main {
-            width: 60%;
+            padding: 0 2rem;
           }
         }
       `}</style>
