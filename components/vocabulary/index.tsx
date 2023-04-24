@@ -1,3 +1,4 @@
+import SearchBar from "@/components/vocabulary/SearchBar";
 import LevelSelector from "@/components/vocabulary/LevelSelector";
 import QuizCard from "@/components/vocabulary/quiz/QuizCard";
 import QuizMoreButton from "@/components/vocabulary/quiz/QuizMoreButton";
@@ -8,6 +9,7 @@ import QuizResultRateGraph from "@/components/vocabulary/quiz/QuizResultRateGrap
 
 
 export {
+  SearchBar,
   LevelSelector,
   QuizCard,
   QuizMoreButton,
