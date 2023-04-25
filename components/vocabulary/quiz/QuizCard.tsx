@@ -1,15 +1,22 @@
-import { HeartIcon } from "@heroicons/react/20/solid";
+import { VocabularyType } from "@/types/vocabulary";
+// import { HeartIcon } from "@heroicons/react/20/solid";
 
 
-export default function QuizCard() {
+type Props = {
+  item: VocabularyType;
+}
+
+export default function QuizCard({ item }: Props) {
   return (
     <article>
-      <p>문제1</p>
+      <p>{item.vocabulary_kanji}와 히라가나 다른 단어는?</p>
       <div>
         <div>
-          <HeartIcon className="h-5 w-5" aria-hidden="true" />
-          <span>10</span>
+          {/* <HeartIcon className="h-5 w-5" aria-hidden="true" /> */}
+          <span>{item.vocabulary_level_name}</span>
         </div>
+
+        {/* TODO: 정답률 계산 */}
         <div>정답률 50% (현재 10,000명 참여중)</div>
       </div>
 

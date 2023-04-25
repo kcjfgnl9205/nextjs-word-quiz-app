@@ -1,12 +1,19 @@
 import { ArrowDownCircleIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
 
 
-export default function QuizMoreButton() {
+type Props = {
+  showCount: number;
+  totalCount: number;
+  addVocabulariesHandler: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export default function QuizMoreButton({ showCount, totalCount, addVocabulariesHandler }: Props) {
+
   return (
-    <article>
-      <div>
+    <article id="section-1">
+      <div onClick={(e) => {  addVocabulariesHandler(e); } }>
         <ArrowDownCircleIcon className="mr-1.5 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-        퀴즈 더보기 30 / 184
+        퀴즈 더보기 {showCount} / {totalCount}
       </div>
       <div onClick={() => window.scrollTo({ top: 0 })}>
         <ArrowUpIcon className="mr-1.5 h-5 w-5 flex-shrink-0" aria-hidden="true" />
