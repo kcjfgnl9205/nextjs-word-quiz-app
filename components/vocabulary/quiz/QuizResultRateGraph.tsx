@@ -1,15 +1,18 @@
+import { VocabularyOptionType } from "@/types/vocabulary";
+
 
 type Props = {
-  isAnswer: boolean;
+  option: VocabularyOptionType;
+  percentage: number;
 }
 
-export default function QuizResultRateGraph({ isAnswer }: Props) {
+export default function QuizResultRateGraph({ option, percentage }: Props) {
 
   return (
     <section>
       <div>
-        <span>단어1</span>
-        <span>70%</span>
+        <span>{option.vocabulary_hira}</span>
+        <span>{percentage}%</span>
       </div>
       <input type="range" name="rating" min="0" max="100" step="1" value="0" disabled />
 
@@ -18,7 +21,7 @@ export default function QuizResultRateGraph({ isAnswer }: Props) {
         section {
           font-size: 18px;
           padding: 22px 0 12px 0;
-          color: ${isAnswer ? "#1a237e" : "#9e9e9e" };
+          color: ${option.is_answer ? "#1a237e" : "#9e9e9e" };
         }
 
         div {
@@ -53,7 +56,7 @@ export default function QuizResultRateGraph({ isAnswer }: Props) {
         input[type=range]::-webkit-slider-runnable-track {
           width: 100%;
           height: 5px;
-          background: linear-gradient(to right, ${isAnswer ? "#311b92" : "#9e9e9e"} 70%, #fff 70%);
+          background: linear-gradient(to right, ${option.is_answer ? "#311b92" : "#9e9e9e"} ${percentage}%, #fff ${percentage}%);
           border-radius: 5px;
           border: none;
           outline: none;

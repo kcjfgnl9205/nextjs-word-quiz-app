@@ -5,9 +5,8 @@ import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
 
 
 type ApiResponse = {
-  data?: VocabularyType;
-  data_options?: Array<VocabularyOptionType>;
-  response?: any;
+  data: VocabularyType;
+  data_options: Array<VocabularyOptionType>;
 }
 
 export default async function handler(
@@ -35,19 +34,29 @@ export default async function handler(
 
     // 해당단어에 해당하는 보기 리스트
      const getVocabularyOptions = `
-          SELECT VOCABULARY_OPTION_MST.option_id AS id
-               , VOCABULARY_OPTION_MST.vocabulary_id
-               , VOCABULARY_MST_SUB.vocabulary_kanji
-               , VOCABULARY_MST_SUB.vocabulary_hira
-               , VOCABULARY_MST_SUB.vocabulary_mean
-               , VOCABULARY_OPTION_MST.is_answer
-            FROM VOCABULARY_MST
-      INNER JOIN VOCABULARY_OPTION_MST
-              ON VOCABULARY_MST.vocabulary_id = VOCABULARY_OPTION_MST.vocabulary_id
-      INNER JOIN VOCABULARY_MST AS VOCABULARY_MST_SUB
-              ON VOCABULARY_OPTION_MST.vocabulary_option_id = VOCABULARY_MST_SUB.vocabulary_id
-           WHERE VOCABULARY_MST.vocabulary_id = ?
-        ORDER BY VOCABULARY_OPTION_MST.option_id
+           SELECT VOCABULARY_OPTION_MST.option_id AS id
+                , VOCABULARY_MST.vocabulary_id
+                , VOCABULARY_MST_SUB.vocabulary_kanji
+                , VOCABULARY_MST_SUB.vocabulary_hira
+                , VOCABULARY_MST_SUB.vocabulary_mean
+                , VOCABULARY_OPTION_MST.is_answer
+                , COUNT(QUIZ_RESULT.quiz_id) AS cnt
+             FROM VOCABULARY_MST
+       INNER JOIN VOCABULARY_OPTION_MST
+               ON VOCABULARY_MST.vocabulary_id = VOCABULARY_OPTION_MST.vocabulary_id
+       INNER JOIN VOCABULARY_MST AS VOCABULARY_MST_SUB
+               ON VOCABULARY_OPTION_MST.vocabulary_option_id = VOCABULARY_MST_SUB.vocabulary_id
+        LEFT JOIN QUIZ_RESULT
+               ON VOCABULARY_MST.vocabulary_id = QUIZ_RESULT.vocabulary_id
+              AND VOCABULARY_OPTION_MST.option_id = QUIZ_RESULT.option_id
+            WHERE VOCABULARY_MST.vocabulary_id = ?
+         GROUP BY VOCABULARY_OPTION_MST.option_id
+                , VOCABULARY_MST.vocabulary_id
+                , VOCABULARY_MST_SUB.vocabulary_kanji
+                , VOCABULARY_MST_SUB.vocabulary_hira
+                , VOCABULARY_MST_SUB.vocabulary_mean
+                , VOCABULARY_OPTION_MST.is_answer
+         ORDER BY VOCABULARY_OPTION_MST.option_id
     `;
 
     const [ vocabulary, data_options ] = await Promise.all([
@@ -55,19 +64,5 @@ export default async function handler(
       query({ query: getVocabularyOptions, values: [id] }),
     ]);
     res.status(200).json({ data: vocabulary, data_options: data_options });
-  } else if (req.method === "POST") {
-    let message = "";
-    const { user_id, vocabulary_id, option_id } = req.body;
-    const addVocabularyResultQuery = `
-      INSERT QUIZ_RESULT(user_id, vocabulary_id, option_id) VALUES(?, ?, ?)
-    `;
-
-    const [ addResult ] = await Promise.all([
-      query({ query: addVocabularyResultQuery, values: [user_id, vocabulary_id, option_id] })
-    ]);
-
-    message = addResult.insertId ? "success" : "error";
-
-    res.status(200).json({ response: { message: message } });
   }
 }

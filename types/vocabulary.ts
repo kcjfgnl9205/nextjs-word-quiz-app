@@ -14,6 +14,8 @@ export type VocabularyType = {
   vocabulary_level_id: number;
   vocabulary_level_name: string;
   vocabulary_options?: Array<VocabularyOptionType>;
+  totalCnt?: number;
+  cnt?: number;
 }
 
 // 단어 보기

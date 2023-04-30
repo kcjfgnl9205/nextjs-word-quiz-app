@@ -1,14 +1,29 @@
 import { QuizResultRateGraph } from "@/components/vocabulary";
+import { VocabularyOptionType } from "@/types/vocabulary";
+import { acalculatePercentage, toCommaSeparatedString } from "@/utils/common";
 
 
-export default function QuizResultRate() {
+type Props = {
+  item_options: Array<VocabularyOptionType>;
+}
+
+export default function QuizResultRate({ item_options }: Props) {
+  const totalCnt = item_options.reduce((acc, cur) => { return acc + cur.cnt }, 0);
 
   return (
     <div>
-      <p>현재 10,000명 참여중</p>
-      <QuizResultRateGraph isAnswer={true} />
-      <QuizResultRateGraph isAnswer={false} />
-      <QuizResultRateGraph isAnswer={false} />
+      <p>현재 {toCommaSeparatedString(totalCnt)}명 참여중</p>
+      {
+        item_options.map((option: VocabularyOptionType, index: number) => {
+          return (
+            <QuizResultRateGraph
+              key={index}
+              option={option}
+              percentage={acalculatePercentage(option.cnt, totalCnt)}
+            />
+          )
+        })
+      }
 
 
       <style jsx>{`

@@ -1,4 +1,5 @@
 import { VocabularyType } from "@/types/vocabulary";
+import { acalculatePercentage, toCommaSeparatedString } from "@/utils/common";
 // import { HeartIcon } from "@heroicons/react/20/solid";
 
 
@@ -17,7 +18,7 @@ export default function QuizCard({ item }: Props) {
         </div>
 
         {/* TODO: 정답률 계산 */}
-        <div>정답률 50% (현재 10,000명 참여중)</div>
+        <div>정답률 {acalculatePercentage(item.cnt, item.totalCnt)}% (현재 {toCommaSeparatedString(item.totalCnt)}명 참여중)</div>
       </div>
 
 

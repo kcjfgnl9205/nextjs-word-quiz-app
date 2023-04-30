@@ -1,13 +1,19 @@
 import Link from "next/link";
 
+import { VocabularyType } from "@/types/vocabulary";
 
-export default function QuizResult() {
+
+type Props = {
+  item: VocabularyType;
+}
+
+export default function QuizResult({ item }: Props) {
 
   return (
     <div>
       <p>정답</p>
-      <h4>단어</h4>
-      <p>뜻1, 뜻2, 뜻3</p>
+      <h4>{item.vocabulary_kanji} ({item.vocabulary_hira})</h4>
+      <p>{item.vocabulary_mean}</p>
     
       <Link href={`/vocabulary/quiz/1`} legacyBehavior>
         <a>&gt;</a>
