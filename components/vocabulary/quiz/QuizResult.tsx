@@ -1,13 +1,12 @@
-import Link from "next/link";
-
 import { VocabularyType } from "@/types/vocabulary";
 
 
 type Props = {
   item: VocabularyType;
+  onClickNextQuizPage: () => void;
 }
 
-export default function QuizResult({ item }: Props) {
+export default function QuizResult({ item, onClickNextQuizPage }: Props) {
 
   return (
     <div>
@@ -15,9 +14,7 @@ export default function QuizResult({ item }: Props) {
       <h4>{item.vocabulary_kanji} ({item.vocabulary_hira})</h4>
       <p>{item.vocabulary_mean}</p>
     
-      <Link href={`/vocabulary/quiz/1`} legacyBehavior>
-        <a>&gt;</a>
-      </Link>
+      <button onClick={onClickNextQuizPage}>&gt;</button>
 
 
       <style jsx>{`
@@ -38,7 +35,7 @@ export default function QuizResult({ item }: Props) {
           margin-bottom: 16px;
         }
 
-        div > a {
+        button {
           display: block;
           position: absolute;
           right: 0;
