@@ -1,8 +1,15 @@
-export default function QuizOptionButton() {
+import { VocabularyOptionType } from "@/types/vocabulary";
+
+
+type Props = {
+  option: VocabularyOptionType;
+}
+
+export default function QuizOptionButton({ option }: Props) {
   return (
     <div>
       <p>
-        옵션 1
+        {option.vocabulary_hira}
       </p>
 
 

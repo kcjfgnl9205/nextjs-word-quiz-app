@@ -1,23 +1,32 @@
+import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
+
 import { QuizOptionButton } from "@/components/vocabulary";
+import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
 
 
-export default function QuizDetailPage() {
+type Props = {
+  item: VocabularyType;
+  item_options: Array<VocabularyOptionType>;
+}
+
+export default function QuizDetailPage({ item, item_options }: Props) {
   return (
     <section>
       <div>
-      <h6>문제 - 이것은 무엇인가?</h6>
+      <h6>{item.vocabulary_kanji}와 히라가나 다른 단어는??</h6>
       {
-        new Array(4).fill("").map((_, index: number) => {
+        item_options.map((option: VocabularyOptionType, index: number) => {
           return (
             <Link key={index} href={`/vocabulary/quiz/${index}/result`} >
-              <QuizOptionButton />
+              <QuizOptionButton option={option} />
             </Link>
           )
         })
       }
-
       </div>
+
+
       <style jsx>{`
         section {
           display: flex;
@@ -48,3 +57,30 @@ export default function QuizDetailPage() {
     </section>
   )
 }
+
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const id: string = context.params?.id as string;
+  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
+  const vocabulary = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}`, postData)).json();
+
+  return {
+    props: {
+      item: vocabulary.data[0],
+      item_options: vocabulary.data_options
+    },
+    revalidate: 60 * 60 * 24 //하루에 한번 페이지 생성
+  };
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
+  const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, postData)).json();
+  const pathList = response.vocabularyId;
+  const paths = pathList.map((data: any) => { return { params: { id: data.id.toString() } } })
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
+};
