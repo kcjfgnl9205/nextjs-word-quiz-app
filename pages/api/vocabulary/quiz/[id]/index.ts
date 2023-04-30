@@ -5,8 +5,9 @@ import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
 
 
 type ApiResponse = {
-  data: VocabularyType;
-  data_options: Array<VocabularyOptionType>;
+  data?: VocabularyType;
+  data_options?: Array<VocabularyOptionType>;
+  response?: any;
 }
 
 export default async function handler(
@@ -54,5 +55,19 @@ export default async function handler(
       query({ query: getVocabularyOptions, values: [id] }),
     ]);
     res.status(200).json({ data: vocabulary, data_options: data_options });
+  } else if (req.method === "POST") {
+    let message = "";
+    const { user_id, vocabulary_id, option_id } = req.body;
+    const addVocabularyResultQuery = `
+      INSERT QUIZ_RESULT(user_id, vocabulary_id, option_id) VALUES(?, ?, ?)
+    `;
+
+    const [ addResult ] = await Promise.all([
+      query({ query: addVocabularyResultQuery, values: [user_id, vocabulary_id, option_id] })
+    ]);
+
+    message = addResult.insertId ? "success" : "error";
+
+    res.status(200).json({ response: { message: message } });
   }
 }

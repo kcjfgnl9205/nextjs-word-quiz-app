@@ -1,5 +1,4 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import Link from "next/link";
 
 import { QuizOptionButton } from "@/components/vocabulary";
 import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
@@ -18,9 +17,12 @@ export default function QuizDetailPage({ item, item_options }: Props) {
       {
         item_options.map((option: VocabularyOptionType, index: number) => {
           return (
-            <Link key={index} href={`/vocabulary/quiz/${index}/result`} >
-              <QuizOptionButton option={option} />
-            </Link>
+            <QuizOptionButton
+              key={index}
+              vocabularyId={item.id}
+              option={option}
+              path={`/vocabulary/quiz/${item.id}/result`}
+            />
           )
         })
       }
