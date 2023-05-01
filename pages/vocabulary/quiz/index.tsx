@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
 
 import { LevelSelector, QuizCard, QuizMoreButton } from "@/components/vocabulary";
 import { Level, VocabularyType } from "@/types/vocabulary";
@@ -17,7 +18,7 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
   const router = useRouter();
 
   // 레벨별 단어 개수 확인
-  const getTotalCount = useCallback((id: string | undefined): number => {
+  const getTotalCount = (id: string | undefined): number => {
     let cnt = 0;
     cnt = levelsProps.reduce((acc, cur) => { 
       if (id === undefined || id === "undefined") {
@@ -27,7 +28,7 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
       }
     }, 0);
     return cnt;
-  }, []);
+  };
 
   
   const cnt = 3;
@@ -79,13 +80,13 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
   }, [selectedLevelId, getVocabularies]);
   
   // 레벨 선택 이벤트
-  const changeSelectedLevelIdHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeSelectedLevelIdHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedLevelId(e.target.value === 'undefined' ? undefined : e.target.value);
     setIsFlag(false);
     const totalCnt = getTotalCount(e.target.value);
     setTotalCount(totalCnt);
     setShowCount(totalCnt === 0 ? 0 : totalCnt < cnt ? totalCnt : cnt);
-  }, []);
+  };
 
   // 보기단어 추가 이벤트
   const addVocabulariesHandler = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
@@ -121,19 +122,35 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // 레벨ID
   const { level_id } = context.query;
-
-  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
-  const vocabulariesProps = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz?level_id=${level_id}&showCnt=3`, postData)).json();
   const parameters = { "level_id": level_id }
   if (typeof parameters.level_id === 'undefined') {
     delete parameters.level_id;
   }
-  
-  return {
-    props: {
-      parameters: parameters,
-      levelsProps: vocabulariesProps.levelData,
-      vocabulariesProps: vocabulariesProps.data
-    },
+
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz`, {
+      params: {
+        level_id: level_id,
+        showCnt: 3
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return {
+      props: {
+        parameters: parameters,
+        levelsProps: response.data.levelData,
+        vocabulariesProps: response.data.data
+      },
+    }
+  } catch (error) {
+    return {
+      props: {
+        parameters: [],
+        levelsProps: [],
+        vocabulariesProps: []
+      },
+    }
   }
 }

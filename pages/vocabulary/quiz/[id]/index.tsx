@@ -1,4 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next";
+import axios from "axios";
 
 import { QuizOptionButton } from "@/components/vocabulary";
 import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
@@ -76,13 +77,23 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
-  const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, postData)).json();
-  const pathList = response.vocabularyId;
-  const paths = pathList.map((data: any) => { return { params: { id: data.id.toString() } } })
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const pathList = response.data.vocabularyId;
+    const paths = pathList.map((data: any) => { return { params: { id: data.id.toString() } } })
 
-  return {
-    paths,
-    fallback: 'blocking',
-  };
+    return {
+      paths,
+      fallback: 'blocking',
+    };
+  } catch (error) {
+    return {
+      paths: [],
+      fallback: 'blocking',
+    };
+  }
 };

@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 import { QuizResult, QuizResultRate } from "@/components/vocabulary";
 import { VocabularyType, VocabularyOptionType } from "@/types/vocabulary";
@@ -29,10 +30,9 @@ export default function QuizResultPage({ item, item_options, vocabulary_ids }: P
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const id: string = context.params?.id as string;
-  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
-  const [ response, responseIds ] = await Promise.all([
-    (await (fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}/result`, postData))).json(),
-    (await (fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, postData))).json()
+  const [ response, responseIds ] = await axios.all([
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}/result`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data),
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data)
   ]);
 
   return {
@@ -46,13 +46,23 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
-  const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, postData)).json();
-  const pathList = response.vocabularyId;
-  const paths = pathList.map((data: any) => { return { params: { id: data.id.toString() } } })
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const pathList = response.data.vocabularyId;
+    const paths = pathList.map((data: any) => { return { params: { id: data.id.toString() } } })
 
-  return {
-    paths,
-    fallback: 'blocking',
-  };
+    return {
+      paths,
+      fallback: 'blocking',
+    };
+  } catch (error) {
+    return {
+      paths: [],
+      fallback: 'blocking',
+    };
+  }
 };
