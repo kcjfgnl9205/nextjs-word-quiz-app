@@ -1,10 +1,10 @@
-import MainTodayIsCard from "@/components/common/MainTodayIsCard";
-import MainQuizCard from "@/components/common/MainQuizCard";
-import MainJLPTCard from "@/components/common/MainJLPTCard";
+import NavBar from "@/components/common/NavBar";
+import Footer from "@/components/common/Footer";
+import Layout from "@/components/common/Layout";
 
 
 export {
-  MainTodayIsCard,
-  MainQuizCard,
-  MainJLPTCard
+  NavBar,
+  Footer,
+  Layout
 }

@@ -1,5 +1,4 @@
-import NavBar from "@/components/common/NavBar";
-import Footer from "@/components/common/Footer";
+import { NavBar, Footer } from "@/components/common";
 
 
 type Props = {
