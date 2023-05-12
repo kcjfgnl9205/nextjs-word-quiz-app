@@ -64,16 +64,30 @@ export default function QuizDetailPage({ item, item_options }: Props) {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const id: string = context.params?.id as string;
-  const postData = { method: "GET", headers: { "Content-Type": "application/json", } };
-  const vocabulary = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}`, postData)).json();
+  try {
 
-  return {
-    props: {
-      item: vocabulary.data[0],
-      item_options: vocabulary.data_options
-    },
-    revalidate: 60 * 60 * 24 //하루에 한번 페이지 생성
-  };
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return {
+      props: {
+        item: response.data.data[0],
+        item_options: response.data.data_options
+      },
+      revalidate: 60 * 60 * 24 //하루에 한번 페이지 생성
+    };
+  } catch (error) {
+    return {
+      props: {
+        item: [],
+        item_options: []
+      },
+      revalidate: 60 * 60 * 24 //하루에 한번 페이지 생성
+    };
+  }
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

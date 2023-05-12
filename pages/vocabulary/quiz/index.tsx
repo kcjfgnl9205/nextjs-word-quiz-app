@@ -41,9 +41,16 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
 
   // 단어 데이터 가져오기
   const getVocabularies = useCallback(async (id: string | undefined) => {
-    const postData = { method: "GET", headers: { "Content-Type": "application/json", }};
-    const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz?level_id=${id}&showCnt=${showCount}`, postData)).json();
-    return response;
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz?level_id=${id}&showCnt=${showCount}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return [];
+    }
   }, [showCount])
 
 
@@ -101,7 +108,7 @@ export default function Quiz({ parameters, levelsProps, vocabulariesProps }: Pro
     <div>
       <LevelSelector items={levelsProps} selectedLevelId={selectedLevelId} changeSelectedLevelIdHandler={changeSelectedLevelIdHandler} />
       {
-        vocabularies.map((vocabulary: VocabularyType, index: number) => {
+        vocabularies?.map((vocabulary: VocabularyType, index: number) => {
           return (
             <Link key={index} href={`/vocabulary/quiz/${vocabulary.id}`} >
               <QuizCard item={vocabulary} />
@@ -145,6 +152,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     }
   } catch (error) {
+    console.log("error")
     return {
       props: {
         parameters: [],
