@@ -1,89 +1,164 @@
-import { MainTodayIsCard, MainQuizCard, MainJLPTCard } from "@/components/common";
-import { SearchBar } from "@/components/vocabulary";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
+
+import { LevelSelector, QuizCard, QuizMoreButton } from "@/components/quiz";
+import { Level, VocabularyType } from "@/types/vocabulary";
 
 
-export default function Home() {
-  return (
-    <div >
-      <div className="search__container">
-        <h4>일본어 단어검색</h4>
-        <SearchBar />
-      </div>
+type Props = {
+  parameters: Record<string, string | number>;
+  levelsProps: Array<Level>;
+  vocabulariesProps: Array<VocabularyType>;
+}
 
+export default function Home({ parameters, levelsProps, vocabulariesProps }: Props) {
+  const router = useRouter();
 
-      <div className="container">
-        <article>
-          <h4>오늘의 회화&gt;&gt;</h4>
-          <MainTodayIsCard />
-        </article>
-        <article>
-          <h4>오늘의 단어&gt;&gt;</h4>
-          <MainTodayIsCard />
-        </article>
-      </div>
-
-
-      <h4>단어퀴즈</h4>
-      <div className="container2">
-        <article>
-          <MainQuizCard />
-        </article>
-        <article>
-          <MainQuizCard />
-        </article>
-        <article>
-          <MainQuizCard />
-        </article>
-      </div>
-
-
-      <h4>JLPT단어</h4>
-      <div className="container2">
-        <article>
-          <MainJLPTCard />
-        </article>
-        <article>
-          <MainJLPTCard />
-        </article>
-        <article>
-          <MainJLPTCard />
-        </article>
-      </div>
-
-
-      <style jsx>{`
-      .search__container {
-        margin: 2rem 0;
+  // 레벨별 단어 개수 확인
+  const getTotalCount = (id: string | undefined): number => {
+    let cnt = 0;
+    cnt = levelsProps.reduce((acc, cur) => { 
+      if (id === undefined || id === "undefined") {
+        return acc + cur.cnt;
+      } else {
+        return (cur.level_id === parseInt(id)) ? acc + cur.cnt : acc;
       }
+    }, 0);
+    return cnt;
+  };
 
-      .container,
-      .container2 {
-        display: grid;
-        grid-template-columns: repeat(1);
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
+  
+  const cnt = 3;
+  const totalCnt = getTotalCount(parameters.level_id as string);
+  const [ showCount, setShowCount ] = useState<number>(totalCnt < cnt ? totalCnt : cnt);
+  const [ totalCount, setTotalCount ] = useState<number>(totalCnt);
+  const [ selectedLevelId, setSelectedLevelId ] = useState<string | undefined>(parameters.level_id as string);
+  const [ vocabularies, setVocabularies ] = useState<Array<VocabularyType>>(vocabulariesProps);
+  const [ isFlag, setIsFlag ] = useState<boolean>(false);
+
+  // 단어 데이터 가져오기
+  const getVocabularies = useCallback(async (id: string | undefined) => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz?level_id=${id}&showCnt=${showCount}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return [];
+    }
+  }, [showCount])
+
+
+  // 레벨이 변경될떄마다 실행
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(router.asPath.split('?')[1]);
+    const existingParam = urlSearchParams.get('level_id');
+    if(!isFlag){
+      setIsFlag(true);
       
-      @media (min-width: 640px) {
-        .container {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+      if (selectedLevelId) {
+        if (existingParam) {
+          urlSearchParams.set('level_id', selectedLevelId.toString());
+        } else {
+          urlSearchParams.append('level_id', selectedLevelId.toString());
         }
-        
-        .container2 {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
+      } else {
+        urlSearchParams.delete('level_id');
       }
-    
-      article {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+
+      router.push({
+        pathname: router.pathname,
+        query: urlSearchParams.toString(),
+      });
+    }
+  }, [selectedLevelId, isFlag, router]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await getVocabularies(selectedLevelId);
+      setVocabularies(response.data);
+    }
+    getData();  
+  }, [selectedLevelId, getVocabularies]);
+  
+  // 레벨 선택 이벤트
+  const changeSelectedLevelIdHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedLevelId(e.target.value === 'undefined' ? undefined : e.target.value);
+    setIsFlag(false);
+    const totalCnt = getTotalCount(e.target.value);
+    setTotalCount(totalCnt);
+    setShowCount(totalCnt === 0 ? 0 : totalCnt < cnt ? totalCnt : cnt);
+  };
+
+  // 보기단어 추가 이벤트
+  const addVocabulariesHandler = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (showCount >= totalCnt) {
+      return;
+    }
+
+    setShowCount((prev: number) => prev + cnt > totalCnt ? totalCnt : prev + cnt);
+  }, [showCount, totalCnt]);
+
+  return (
+    <div>
+      <LevelSelector items={levelsProps} selectedLevelId={selectedLevelId} changeSelectedLevelIdHandler={changeSelectedLevelIdHandler} />
+      {
+        vocabularies?.map((vocabulary: VocabularyType, index: number) => {
+          return (
+            <Link key={index} href={`/quiz/${vocabulary.id}`} >
+              <QuizCard item={vocabulary} />
+            </Link>
+          )
+        })
       }
-    
-      h4 {
-        font-weight: bold;
-      }
-      `}</style>
+      <QuizMoreButton 
+        showCount={showCount}
+        totalCount={totalCount}
+        addVocabulariesHandler={addVocabulariesHandler}
+      />
     </div>
   )
+}
+
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // 레벨ID
+  const { level_id } = context.query;
+  const parameters = { "level_id": level_id }
+  if (typeof parameters.level_id === 'undefined') {
+    delete parameters.level_id;
+  }
+
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz`, {
+      params: {
+        level_id: level_id,
+        showCnt: 3
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return {
+      props: {
+        parameters: parameters,
+        levelsProps: response.data.levelData,
+        vocabulariesProps: response.data.data
+      },
+    }
+  } catch (error) {
+    console.log("error")
+    return {
+      props: {
+        parameters: [],
+        levelsProps: [],
+        vocabulariesProps: []
+      },
+    }
+  }
 }

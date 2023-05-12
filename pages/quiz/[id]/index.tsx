@@ -1,7 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import axios from "axios";
 
-import { QuizOptionButton } from "@/components/vocabulary";
+import { QuizOptionButton } from "@/components/quiz";
 import { VocabularyOptionType, VocabularyType } from "@/types/vocabulary";
 
 
@@ -22,7 +22,7 @@ export default function QuizDetailPage({ item, item_options }: Props) {
               key={index}
               vocabularyId={item.id}
               option={option}
-              path={`/vocabulary/quiz/${item.id}/result`}
+              path={`/quiz/${item.id}/result`}
             />
           )
         })
@@ -66,7 +66,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const id: string = context.params?.id as string;
   try {
 
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz/${id}`, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -92,7 +92,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz-paths`, {
       headers: {
         'Content-Type': 'application/json'
       }

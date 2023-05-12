@@ -28,7 +28,7 @@ export default function QuizOptionButton({ vocabularyId, option, path }: Props) 
         option_id: option.id
       })
     };
-    const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${vocabularyId}`, postData)).json();
+    const response = await (await fetch(`${process.env.NEXT_PUBLIC_URL}/api/quiz/${vocabularyId}`, postData)).json();
     if (response.response.message !== "success") {
       console.log("error")
       return;

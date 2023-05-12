@@ -2,10 +2,9 @@ import NavBar from "@/components/common/NavBar";
 import Footer from "@/components/common/Footer";
 
 
-interface Props {
+type Props = {
   children: React.ReactNode;
 }
-
 
 export default function Layout({ children }: Props) {
   return (

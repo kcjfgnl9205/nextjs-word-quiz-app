@@ -2,7 +2,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import axios from "axios";
 
-import { QuizResult, QuizResultRate } from "@/components/vocabulary";
+import { QuizResult, QuizResultRate } from "@/components/quiz";
 import { VocabularyType, VocabularyOptionType } from "@/types/vocabulary";
 
 
@@ -16,7 +16,7 @@ export default function QuizResultPage({ item, item_options, vocabulary_ids }: P
   const router = useRouter();
   const onClickNextQuizPage = () => {
     const random = Math.floor(Math.random() * vocabulary_ids.length) + 1;
-    router.push(`/vocabulary/quiz/${vocabulary_ids[random].id}`);
+    router.push(`/quiz/${vocabulary_ids[random].id}`);
   }
 
   return (
@@ -31,8 +31,8 @@ export default function QuizResultPage({ item, item_options, vocabulary_ids }: P
 export const getStaticProps: GetStaticProps = async (context) => {
   const id: string = context.params?.id as string;
   const [ response, responseIds ] = await axios.all([
-    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz/${id}/result`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data),
-    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data)
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz/${id}/result`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data),
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz-paths`, { headers: { 'Content-Type': 'application/json' } }).then(res => res.data)
   ]);
 
   return {
@@ -47,7 +47,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/vocabulary/quiz-paths`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}/api/quiz-paths`, {
       headers: {
         'Content-Type': 'application/json'
       }

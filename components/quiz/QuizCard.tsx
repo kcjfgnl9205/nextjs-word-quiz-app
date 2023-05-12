@@ -1,6 +1,5 @@
 import { VocabularyType } from "@/types/vocabulary";
 import { acalculatePercentage, toCommaSeparatedString } from "@/utils/common";
-// import { HeartIcon } from "@heroicons/react/20/solid";
 
 
 type Props = {
@@ -13,11 +12,9 @@ export default function QuizCard({ item }: Props) {
       <p>{item.vocabulary_kanji}와 히라가나 다른 단어는?</p>
       <div>
         <div>
-          {/* <HeartIcon className="h-5 w-5" aria-hidden="true" /> */}
           <span>{item.vocabulary_level_name}</span>
         </div>
 
-        {/* TODO: 정답률 계산 */}
         <div>정답률 {acalculatePercentage(item.cnt, item.totalCnt)}% (현재 {toCommaSeparatedString(item.totalCnt)}명 참여중)</div>
       </div>
 

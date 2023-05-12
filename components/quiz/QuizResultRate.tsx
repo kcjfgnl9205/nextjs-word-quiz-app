@@ -1,4 +1,4 @@
-import { QuizResultRateGraph } from "@/components/vocabulary";
+import { QuizResultRateGraph } from "@/components/quiz";
 import { VocabularyOptionType } from "@/types/vocabulary";
 import { acalculatePercentage, toCommaSeparatedString } from "@/utils/common";
 
